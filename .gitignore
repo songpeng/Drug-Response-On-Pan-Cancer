@@ -240,3 +240,6 @@ sympy-plots-for-*.tex/
 #-- PERSONAL IGNORE
 *.tmp
 *.temp
+
+#-- Ignore .txt
+*.txt
