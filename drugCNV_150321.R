@@ -10,7 +10,7 @@
 #-- Load the library
 library(data.table)
 library(stringr)
-
+library(ggplot2)
 #-- Load the patient information.
 patient_infor <-
     read.table('cancer.patient.drug.response.gistic2.txt',quote="",
@@ -56,7 +56,13 @@ pairdetectSenseGene <- function(genenm){
     if (numequalzero/samplenm <= zeronumcutoff){return(1)}
     else{
         # Get the p-value for one gene.
-        pvalue <- pairwise.t.test(responseCisReorder[1,],patient_response_cis)
+        pvalue <- pairwise.t.test(tmparray,patient_response_cis)$p.value
     return(pvalue)
     }
 }
+
+pvaluearrayCisCNV <- unlist(lapply(rownames(responseCisReorder),function(x)
+                            pairdetectSenseGene(x)))
+summaryCisCNV <- matrix(pvaluearrayCisCNV,
+                           dimnames=list(
+                               rownames(responseCisReorder),c("pvalue")))
