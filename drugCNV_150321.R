@@ -21,6 +21,8 @@ colnames(patient_infor) <- c("cancerType","patientID","drugName","response",
 #rownames(patient_infor) <- patient_infor$patientID
 # Change the levels of patients' responses'
 levels(patient_infor$response) <- c("Stable","Effective","Effective","Stable")
+delrownan <- is.nan(patient_infor$response)
+patient_infor[-delrownan]
 # Get the drug treatment data of Cisplatin on Copy Number Variation (CNV)
 CisplatinCNV <- fread("Cisplatin.gistic2.gdac_20141206.txt")
 
@@ -42,10 +44,16 @@ nametrans <- function(name_drugtreat){
 
 sampleCistreat <- colnames(CisplatinCNV)[2:ncol(CisplatinCNV)]
 patientIDinCis <- unlist(lapply(sampleCistreat,function(x) nametrans(x)))
+# Delete NA
+tmpisna <- is.na(patientIDinCis)
+patientIDinCis <- patientIDinCis[!tmpisna]
+
 patient_response_cis <- patient_cisplatin[patientIDinCis,"response"]
 responseCisReorder <- as.matrix(CisplatinCNV[1:nrow(CisplatinCNV),
                                              2:ncol(CisplatinCNV),with=FALSE])
-row.names(responseCisReorder) <- unlist(CisplatinCNV[1:nrow(CisplatinCNV),1,with=FALSE])
+responseCisReorder <- responseCisReorder[,-which(tmpisna==TRUE)]
+row.names(responseCisReorder) <- unlist(CisplatinCNV[1:nrow(CisplatinCNV),1,
+                                                     with=FALSE])
 
 zeronumcutoff <- 0.05
 samplenm <- length(patientIDinCis)
@@ -66,3 +74,17 @@ pvaluearrayCisCNV <- unlist(lapply(rownames(responseCisReorder),function(x)
 summaryCisCNV <- matrix(pvaluearrayCisCNV,
                            dimnames=list(
                                rownames(responseCisReorder),c("pvalue")))
+# False Discovery Control
+# pvalueajustCisCNV <- p.adjust(summaryCisCNV,"fdr")
+# The mim(pvalueajustCisCNV) is 0.26.
+pvaluesrtCisCNV <- sort(summaryCisCNV,index.return = TRUE)
+pvaluesumCisCNV <- as.matrix(summaryCisCNV[pvaluesrtCisCNV$ix,])
+row.names(pvaluesumCisCNV) <- row.names(summaryCisCNV)[pvaluesrtCisCNV$ix]
+
+# Generate the boxplot
+cnvboxplotcis <- function(genenm){
+    dat <- data.frame(CopyNumVar=responseCisReorder[genenm,],
+                      Treatment=patient_response_cis)
+    p <- ggplot(dat,aes(Treatment,CopyNumVar))
+    p + geom_boxplot()
+}
