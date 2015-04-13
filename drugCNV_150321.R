@@ -36,6 +36,14 @@ CisplatinCNV <- fread("Cisplatin.gistic2.gdac_20141206.txt")
 
 patient_cisplatin <- patient_infor[which(patient_infor$drugName == "Cisplatin"),]
 rownames(patient_cisplatin) <- patient_cisplatin$patientID
+
+# Statistics of responses in each tumor type.
+# In this step, we aim to choose several tumors for single task learning.
+responseEachTumorCis <- function(cancer_type){
+    table(patient_cisplatin$response[which(patient_cisplatin$cancerType==cancer_type)])
+}
+
+
 # Transform the Samples' names in CisplatinCNV to the ones in patient_infor
 nametrans <- function(name_drugtreat){
    m = str_match_all(name_drugtreat, "\\.(.+)-01A")
