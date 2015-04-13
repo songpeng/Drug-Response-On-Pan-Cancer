@@ -43,6 +43,14 @@ responseEachTumorCis <- function(cancer_type){
     table(patient_cisplatin$response[which(patient_cisplatin$cancerType==cancer_type)])
 }
 
+cancerlist <- unique(patient_cisplatin$cancerType)
+statResEachTumorCis <- sapply(cancerlist,function(x) responseEachTumorCis(x))
+write.table(data.frame(TumorType=cancerlist,
+                       Stable=statResEachTumorCis["Stable",],
+                       Effective=statResEachTumorCis["Effective",]),
+            file="statResEachTumor_Cisplatin.txt",
+            quote=FALSE,
+            row.names=FALSE,col.names=TRUE)
 
 # Transform the Samples' names in CisplatinCNV to the ones in patient_infor
 nametrans <- function(name_drugtreat){
@@ -52,6 +60,7 @@ nametrans <- function(name_drugtreat){
 
 sampleCistreat <- colnames(CisplatinCNV)[2:ncol(CisplatinCNV)]
 patientIDinCis <- unlist(lapply(sampleCistreat,function(x) nametrans(x)))
+
 # Delete NA
 tmpisna <- is.na(patientIDinCis)
 patientIDinCis <- patientIDinCis[!tmpisna]
