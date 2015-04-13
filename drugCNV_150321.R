@@ -13,7 +13,7 @@ library(stringr)
 library(ggplot2)
 #-- Load the patient information.
 patient_infor <-
-    read.table('cancer.patient.drug.response.gistic2.txt',quote="",
+    read.table('cancer.patient.drug.response.gistic2.20150330.txt',quote="",
                colClasses=c("factor","character","factor","factor","factor"),
                sep="\t")
 colnames(patient_infor) <- c("cancerType","patientID","drugName","response",
@@ -22,7 +22,7 @@ colnames(patient_infor) <- c("cancerType","patientID","drugName","response",
 # Change the levels of patients' responses'
 levels(patient_infor$response) <- c("Stable","Effective","Effective","Stable")
 delrownan <- is.nan(patient_infor$response)
-patient_infor[-delrownan]
+patient_infor[-delrownan,]
 # Get the drug treatment data of Cisplatin on Copy Number Variation (CNV)
 CisplatinCNV <- fread("Cisplatin.gistic2.gdac_20141206.txt")
 
@@ -65,7 +65,7 @@ pairdetectSenseGene <- function(genenm){
     else{
         # Get the p-value for one gene.
         pvalue <- pairwise.t.test(tmparray,patient_response_cis)$p.value
-    return(pvalue)
+        return(pvalue)
     }
 }
 
