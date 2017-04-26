@@ -1,5 +1,5 @@
 ## NOTE
-This is an quite old repository. For who may want to know more about it, see the publication below:
+This is an old repository. For who may want to know more about it, see the publication below:
 
 *Evaluating the molecule-based prediction of clinical drug responses in cancer*
 
